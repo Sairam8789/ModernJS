@@ -6,6 +6,49 @@
 
 /////////////////////////////////////////////////
 // Data
+// Assuming you have a Babylon.js scene and engine already set up
+var planeOpts = {
+    height: 5.4762,
+    width: 7.3967,
+    sideOrientation: BABYLON.Mesh.DOUBLESIDE
+};
+
+var ANote0Video = BABYLON.MeshBuilder.CreatePlane("plane", planeOpts, scene);
+
+// Set the plane position in world space (e.g., in front of the camera)
+ANote0Video.position = new BABYLON.Vector3(0, 0, 5);
+
+var ANote0VideoMat = new BABYLON.StandardMaterial("m", scene);
+var ANote0VideoVidTex = new BABYLON.VideoTexture("vidtex", "textures/babylonjs.mp4", scene);
+ANote0VideoMat.diffuseTexture = ANote0VideoVidTex;
+ANote0VideoMat.roughness = 1;
+ANote0VideoMat.emissiveColor = new BABYLON.Color3.White();
+ANote0Video.material = ANote0VideoMat;
+
+scene.onPointerObservable.add(function(evt) {
+    if (evt.pickInfo.pickedMesh === ANote0Video) {
+        if (ANote0VideoVidTex.video.paused)
+            ANote0VideoVidTex.video.play();
+        else
+            ANote0VideoVidTex.video.pause();
+        console.log(ANote0VideoVidTex.video.paused ? "paused" : "playing");
+    }
+}, BABYLON.PointerEventTypes.POINTERPICK);
+
+// Render loop
+engine.runRenderLoop(function() {
+    scene.render();
+});
+
+// Update loop
+scene.onBeforeRenderObservable.add(function() {
+    // Convert world coordinates to screen coordinates
+    var screenPosition = ANote0Video.position.clone();
+    scene.activeCamera.worldToScreen(screenPosition);
+
+    // Set the position of the plane in screen space
+    ANote0Video.position = new BABYLON.Vector3(screenPosition.x, screenPosition.y, 0);
+});
 
 // DIFFERENT DATA! Contains movement dates, currency and locale
 
